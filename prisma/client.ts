@@ -1,12 +1,21 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 
 const getPrismaClient = () => {
-  const connectionString = process.env.DATABASE_URL || 'file:./dev.db';
-  const adapter = new PrismaBetterSqlite3({
-    url: connectionString,
-  });
-  return new PrismaClient({ adapter });
+  const connectionString = process.env.DATABASE_URL || '';
+  
+  if (connectionString.startsWith('postgresql://') || connectionString.startsWith('postgres://')) {
+    return new PrismaClient();
+  }
+  
+  try {
+    const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
+    const adapter = new PrismaBetterSqlite3({
+      url: connectionString || 'file:./dev.db',
+    });
+    return new PrismaClient({ adapter });
+  } catch (e) {
+    return new PrismaClient();
+  }
 };
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };

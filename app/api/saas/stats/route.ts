@@ -41,10 +41,10 @@ export async function GET() {
 
     // 3. Count by status
     const totalCount = tenants.length;
-    const activeCount = tenants.filter(t => t.status === 'active').length;
-    const suspendedCount = tenants.filter(t => t.status === 'suspended' || t.status === 'frozen').length;
-    const trialCount = tenants.filter(t => t.status === 'trial').length;
-    const bannedCount = tenants.filter(t => t.status === 'banned').length;
+    const activeCount = tenants.filter((t: any) => t.status === 'active').length;
+    const suspendedCount = tenants.filter((t: any) => t.status === 'suspended' || t.status === 'frozen').length;
+    const trialCount = tenants.filter((t: any) => t.status === 'trial').length;
+    const bannedCount = tenants.filter((t: any) => t.status === 'banned').length;
 
     // 4. Calculate MRR & ARR
     const defaultPrices: Record<string, number> = {
@@ -55,7 +55,7 @@ export async function GET() {
     };
     
     let mrr = 0;
-    tenants.forEach(t => {
+    tenants.forEach((t: any) => {
       if (t.status !== 'active' && t.status !== 'trial') return;
       const price = t.subscriptionPrice !== null ? t.subscriptionPrice : (defaultPrices[t.plan] || 199);
       if (t.subscriptionPeriod === 'yearly') {
@@ -79,7 +79,7 @@ export async function GET() {
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    payments.forEach(p => {
+    payments.forEach((p: any) => {
       const pDate = new Date(p.paidAt);
       if (pDate >= startOfToday) {
         todayRevenue += p.amount;
@@ -114,7 +114,7 @@ export async function GET() {
 
       // Re-calculate revenue values
       const freshPayments = await prisma.platformPayment.findMany();
-      freshPayments.forEach(p => {
+      freshPayments.forEach((p: any) => {
         const pDate = new Date(p.paidAt);
         if (pDate >= startOfToday) {
           todayRevenue += p.amount;
@@ -126,7 +126,7 @@ export async function GET() {
     }
 
     // 6. Paid subscriptions count
-    const paidSubscriptionsCount = tenants.filter(t => t.status === 'active' && t.plan !== 'Trial').length;
+    const paidSubscriptionsCount = tenants.filter((t: any) => t.status === 'active' && t.plan !== 'Trial').length;
 
     // 7. Renewal rate (default 94.8% or calculated if renewals exist)
     const renewals = await prisma.platformRenewal.findMany();
@@ -209,7 +209,7 @@ export async function GET() {
           }
         }
       });
-      const revenueSum = monthPayments.reduce((sum, p) => sum + p.amount, 0);
+      const revenueSum = monthPayments.reduce((sum: number, p: any) => sum + p.amount, 0);
       
       // Total tenants created up to endOfMonthRange
       const tenantsCount = await prisma.tenant.count({
