@@ -14,9 +14,10 @@ import {
   Settings,
   Shield,
   LogOut,
+  X,
 } from 'lucide-react';
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> = ({ isOpen, onClose }) => {
   const pathname = usePathname();
   const { settings, businessConfig, t } = useApp();
 
@@ -67,15 +68,38 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-logo">
-        <span style={{ fontSize: '1.75rem' }}>{businessConfig.icon}</span>
-        <div>
-          <div style={{ lineHeight: '1.2' }}>{settings.businessName}</div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>
-            {settings.language === 'ar' ? businessConfig.nameAr : businessConfig.nameEn}
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+      <div className="sidebar-logo" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '1.5rem 1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span style={{ fontSize: '1.75rem' }}>{businessConfig.icon}</span>
+          <div>
+            <div style={{ lineHeight: '1.2' }}>{settings.businessName}</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>
+              {settings.language === 'ar' ? businessConfig.nameAr : businessConfig.nameEn}
+            </div>
           </div>
         </div>
+        {onClose && (
+          <button 
+            className="mobile-menu-close-btn" 
+            onClick={onClose}
+            style={{ 
+              border: 'none', 
+              background: 'rgba(255, 255, 255, 0.05)', 
+              color: 'var(--text-primary)', 
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px'
+            }}
+            title={t('إغلاق', 'Close')}
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
       
       <nav className="sidebar-nav">

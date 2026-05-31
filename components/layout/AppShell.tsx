@@ -120,6 +120,13 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   }, [isHydrated, router]);
 
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = React.useState(false);
+
+  useEffect(() => {
+    // Close mobile sidebar on page change
+    setIsMobileSidebarOpen(false);
+  }, [pathname]);
+
   useEffect(() => {
     if (!isHydrated) return;
     setMounted(true);
@@ -136,9 +143,15 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   return (
     <div className="app-container">
-      <Sidebar />
+      {isMobileSidebarOpen && (
+        <div 
+          className="sidebar-overlay animate-fade-in" 
+          onClick={() => setIsMobileSidebarOpen(false)} 
+        />
+      )}
+      <Sidebar isOpen={isMobileSidebarOpen} onClose={() => setIsMobileSidebarOpen(false)} />
       <div className="main-content">
-        <Header />
+        <Header onMenuToggle={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)} />
         <main className="page-content">
           {children}
         </main>

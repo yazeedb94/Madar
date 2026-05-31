@@ -231,7 +231,7 @@ export default function CustomerProfile() {
         </Link>
 
         {/* Profile Card Header */}
-        <div className="grid grid-3 mb-3" style={{ gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
+        <div className="responsive-grid-1-2 mb-3">
           
           {/* Main Info Card */}
           <div className="card text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

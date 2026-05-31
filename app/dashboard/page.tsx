@@ -209,7 +209,7 @@ export default function Dashboard() {
         </div>
 
         {/* Dynamic Analytics & Warning Sections */}
-        <div className="grid grid-3 mb-3" style={{ gridTemplateColumns: '2fr 1fr' }}>
+        <div className="responsive-grid-2-1 mb-3">
           
           {/* Revenue & Checkins Graph */}
           <div className="card">

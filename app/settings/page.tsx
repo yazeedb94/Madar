@@ -210,7 +210,7 @@ export default function Settings() {
 
         {/* ──────────── TAB 1: BUSINESS ──────────── */}
         {activeTab === 'business' && (
-          <div className="grid grid-2" style={{ gap: '2rem', gridTemplateColumns: '2fr 1fr', alignItems: 'start' }}>
+          <div className="responsive-grid-2-1" style={{ gap: '2rem', alignItems: 'start' }}>
 
             <form className="card animate-fade-in" onSubmit={handleBizSubmit}>
               <h3 className="card-title mb-2">{t('الملف التجاري للنظام', 'Business Identity')}</h3>

@@ -18,6 +18,7 @@ import {
   DollarSign, 
   Edit2, 
   X,
+  Menu,
   Activity,
   Server,
   FileText,
@@ -62,6 +63,12 @@ export default function SuperAdminPage() {
   const [activeTab, setActiveTab] = useState<
     'dashboard' | 'businesses' | 'billing' | 'users' | 'support' | 'health' | 'logs' | 'security' | 'notifications' | 'settings'
   >('dashboard');
+
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [activeTab]);
 
   // Stats & States loaded from APIs
   const [stats, setStats] = useState<any>(null);
@@ -791,60 +798,92 @@ export default function SuperAdminPage() {
 
   // --- PREMIUM SUPER ADMIN DASHBOARD HUB VIEW ---
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#09090e', color: '#f3f4f6', direction: 'rtl', fontFamily: 'Cairo, sans-serif', display: 'flex' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#09090e', color: '#f3f4f6', direction: 'rtl', fontFamily: 'Cairo, sans-serif', display: 'flex' }} className="app-container">
       
+      {isMobileSidebarOpen && (
+        <div 
+          className="sidebar-overlay animate-fade-in" 
+          onClick={() => setIsMobileSidebarOpen(false)} 
+        />
+      )}
+
       {/* 1. Sleek Right/Left Sidebar Navigation (Glassmorphic Glow & harmony) */}
-      <aside style={{ 
-        width: '295px', 
-        background: 'linear-gradient(180deg, rgba(16, 16, 27, 0.8) 0%, rgba(9, 9, 14, 0.95) 100%)', 
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        borderLeft: '1px solid rgba(255, 255, 255, 0.06)', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        height: '100vh', 
-        position: 'sticky', 
-        top: 0, 
-        zIndex: 100,
-        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.25)'
-      }}>
+      <aside 
+        className={`sidebar super-admin-sidebar ${isMobileSidebarOpen ? 'open' : ''}`}
+        style={{ 
+          width: '295px', 
+          background: 'linear-gradient(180deg, rgba(16, 16, 27, 0.8) 0%, rgba(9, 9, 14, 0.95) 100%)', 
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          borderLeft: '1px solid rgba(255, 255, 255, 0.06)', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          height: '100vh', 
+          position: 'sticky', 
+          top: 0, 
+          zIndex: 100,
+          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.25)'
+        }}
+      >
         
         {/* Sidebar Brand Logo */}
         <div style={{ 
-          padding: '1.75rem 1.5rem', 
+          padding: '1.75rem 1.25rem', 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '0.85rem', 
+          justifyContent: 'space-between',
+          gap: '0.5rem',
           borderBottom: '1px solid rgba(255, 255, 255, 0.05)', 
           background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%)' 
         }}>
-          <div style={{ 
-            backgroundColor: 'rgba(99, 102, 241, 0.18)', 
-            padding: '0.65rem', 
-            borderRadius: '12px', 
-            boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Building2 size={24} style={{ color: '#818cf8' }} />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff', margin: 0, letterSpacing: '-0.3px', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
-              {platformSettings?.platformName || saasPlatformName || 'لوحة السوبر أدمن'}
-            </h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.25rem' }}>
-              <span style={{ 
-                display: 'inline-block', 
-                width: '8px', 
-                height: '8px', 
-                borderRadius: '50%', 
-                backgroundColor: '#10b981', 
-                boxShadow: '0 0 10px #10b981, 0 0 2px #10b981' 
-              }}></span>
-              <span style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>متصل بالكامل ({stats?.system.uptime || '99.98%'})</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div style={{ 
+              backgroundColor: 'rgba(99, 102, 241, 0.18)', 
+              padding: '0.65rem', 
+              borderRadius: '12px', 
+              boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Building2 size={24} style={{ color: '#818cf8' }} />
+            </div>
+            <div>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff', margin: 0, letterSpacing: '-0.3px', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+                {platformSettings?.platformName || saasPlatformName || 'لوحة السوبر أدمن'}
+              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.25rem' }}>
+                <span style={{ 
+                  display: 'inline-block', 
+                  width: '8px', 
+                  height: '8px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#10b981', 
+                  boxShadow: '0 0 10px #10b981, 0 0 2px #10b981' 
+                }}></span>
+                <span style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>متصل بالكامل ({stats?.system.uptime || '99.98%'})</span>
+              </div>
             </div>
           </div>
+          <button 
+            className="mobile-menu-close-btn" 
+            onClick={() => setIsMobileSidebarOpen(false)}
+            style={{ 
+              border: 'none', 
+              background: 'rgba(255, 255, 255, 0.05)', 
+              color: '#fff', 
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px'
+            }}
+            title="إغلاق"
+          >
+            <X size={16} />
+          </button>
         </div>
 
         {/* Sidebar Links Menu Container */}
@@ -1288,8 +1327,16 @@ export default function SuperAdminPage() {
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
         
         {/* Top Sticky Navbar */}
-        <header style={{ height: '70px', backgroundColor: '#10101b', borderBottom: '1px solid #1e1e2f', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2rem', position: 'sticky', top: 0, zIndex: 90 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <header style={{ height: '70px', backgroundColor: '#10101b', borderBottom: '1px solid #1e1e2f', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', position: 'sticky', top: 0, zIndex: 90 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button 
+              className="btn btn-secondary btn-icon mobile-menu-btn" 
+              onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+              title="القائمة"
+              style={{ border: 'none', background: 'rgba(255, 255, 255, 0.05)', color: '#fff' }}
+            >
+              <Menu size={18} />
+            </button>
             <h1 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff' }}>
               {activeTab === 'dashboard' && 'الرئيسية والذكاء المالي المنصاتي'}
               {activeTab === 'businesses' && 'إدارة الأنشطة التجارية المشتركة (Tenants)'}
@@ -1328,7 +1375,7 @@ export default function SuperAdminPage() {
             <div className="animate-fade-in">
               {/* Business Stats Grid */}
               <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#a5b4fc', marginBottom: '1rem', borderRight: '3px solid #6366f1', paddingRight: '0.5rem' }}>إحصائيات الأنشطة التجارية (Businesses)</h3>
-              <div className="grid grid-5 mb-3" style={{ gridTemplateColumns: 'repeat(5, 1fr)', gap: '1.25rem' }}>
+              <div className="responsive-grid-5 mb-3">
                 
                 <div className="stat-card" style={{ background: 'linear-gradient(135deg, #10101b 0%, #151528 100%)', border: '1px solid #1e1e2f' }}>
                   <div className="stat-card-info">
@@ -1384,7 +1431,7 @@ export default function SuperAdminPage() {
 
               {/* Financial Revenue Grid */}
               <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fca5a5', marginTop: '2rem', marginBottom: '1rem', borderRight: '3px solid #ef4444', paddingRight: '0.5rem' }}>الأداء المالي وإيرادات المنصة (Revenue)</h3>
-              <div className="grid grid-6 mb-3" style={{ gridTemplateColumns: 'repeat(6, 1fr)', gap: '1.25rem' }}>
+              <div className="responsive-grid-6 mb-3">
                 
                 <div className="stat-card">
                   <div className="stat-card-info">
@@ -1449,7 +1496,7 @@ export default function SuperAdminPage() {
               </div>
 
               {/* Graphic charts & quick dashboard logs */}
-              <div className="grid grid-2 mb-3" style={{ gridTemplateColumns: '2fr 1.2fr', gap: '1.5rem', marginTop: '2rem' }}>
+              <div className="responsive-grid-2-1 mb-3" style={{ marginTop: '2rem' }}>
                  {/* SVG Trendline Revenue Chart — Dynamic */}
                 <div className="card" style={{ backgroundColor: '#10101b', borderColor: '#1e1e2f' }}>
                   <div className="card-header">
@@ -1759,7 +1806,7 @@ export default function SuperAdminPage() {
           {/* TAB 3: Platform Subscription & Billing Management */}
           {activeTab === 'billing' && (
             <div className="animate-fade-in">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
+              <div className="responsive-grid-1-2">
                 {/* Platform Plans Management */}
                 <div>
                   <div className="flex-between mb-2">
@@ -1948,7 +1995,7 @@ export default function SuperAdminPage() {
           {/* TAB 5: Support & Tickets (نظام الدعم والتذاكر المتكامل) */}
           {activeTab === 'support' && (
             <div className="animate-fade-in">
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+              <div className="responsive-grid-2-1">
                 {/* Tickets list */}
                 <div>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1rem' }}>صندوق تذاكر الدعم والشكاوى (Technical Support Tickets)</h3>
@@ -2097,7 +2144,7 @@ export default function SuperAdminPage() {
               </div>
 
               {/* Uptime details & Live streamer log terminal console */}
-              <div className="grid grid-2" style={{ gridTemplateColumns: '1.2fr 2fr', gap: '1.5rem', marginTop: '2rem' }}>
+              <div className="responsive-grid-1-2" style={{ gap: '1.5rem', marginTop: '2rem' }}>
                 {/* Uptime & Crashes logs */}
                 <div className="card" style={{ backgroundColor: '#10101b', borderColor: '#1e1e2f' }}>
                   <h4 style={{ fontWeight: 'bold', color: '#fff', marginBottom: '1rem' }}>سجل الأعطال النشط والوظائف الفاشلة (Crashes & Failed Jobs)</h4>
@@ -2183,7 +2230,7 @@ export default function SuperAdminPage() {
           {/* TAB 8: Security Center (مركز الأمان والجلسات) */}
           {activeTab === 'security' && (
             <div className="animate-fade-in">
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '2rem' }}>
+              <div className="responsive-grid-1-2">
                 {/* Security features checkboxes */}
                 <div className="card" style={{ backgroundColor: '#10101b', borderColor: '#1e1e2f' }}>
                   <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.25rem', color: '#fff' }}>ميزات الحماية الجدارية والأمان (Security Configurations)</h3>
@@ -2897,7 +2944,7 @@ export default function SuperAdminPage() {
                   />
                 </div>
 
-                <div className="grid grid-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                <div className="grid grid-3" style={{ gap: '1rem' }}>
                   <div className="form-group">
                     <label className="form-label">سعر الباقة</label>
                     <input 

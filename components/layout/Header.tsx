@@ -3,10 +3,10 @@
 import React from 'react';
 import { useApp } from '@/lib/context';
 import { getNotifications } from '@/lib/store';
-import { Sun, Moon, Languages, Bell, User } from 'lucide-react';
+import { Sun, Moon, Languages, Bell, User, Menu } from 'lucide-react';
 import Link from 'next/link';
 
-export const Header: React.FC = () => {
+export const Header: React.FC<{ onMenuToggle?: () => void }> = ({ onMenuToggle }) => {
   const { settings, theme, setTheme, language, setLanguage, t, triggerCount } = useApp();
   
   // Calculate unread notifications
@@ -82,14 +82,25 @@ export const Header: React.FC = () => {
           </button>
         </div>
       )}
-      <header className="header">
-      <div className="header-title">
-        <span style={{ fontWeight: 'normal', color: 'var(--text-secondary)' }}>
-          {t('مرحباً بك في ', 'Welcome to ')}
-        </span>
-        <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>
-          {settings.businessName}
-        </span>
+      <header className="header" style={{ padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {onMenuToggle && (
+          <button 
+            className="btn btn-secondary btn-icon mobile-menu-btn" 
+            onClick={onMenuToggle}
+            title={t('القائمة', 'Menu')}
+          >
+            <Menu size={18} />
+          </button>
+        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+          <span style={{ fontWeight: 'normal', color: 'var(--text-secondary)' }} className="mobile-hide-welcome">
+            {t('مرحباً بك في ', 'Welcome to ')}
+          </span>
+          <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>
+            {settings.businessName}
+          </span>
+        </div>
       </div>
 
       <div className="header-actions">
