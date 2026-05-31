@@ -99,6 +99,8 @@ export default function SuperAdminPage() {
   const [custTenantName, setCustTenantName] = useState('');
   const [custPlan, setCustPlan] = useState('');
   const [custPeriod, setCustPeriod] = useState('monthly');
+  const [customCustPeriodDays, setCustomCustPeriodDays] = useState<number>(7);
+  const [customCustPeriodMonths, setCustomCustPeriodMonths] = useState<number>(3);
   const [custPrice, setCustPrice] = useState<string>('');
   const [custExpiry, setCustExpiry] = useState<string>('');
 
@@ -109,6 +111,8 @@ export default function SuperAdminPage() {
   const [planName, setPlanName] = useState('');
   const [planPrice, setPlanPrice] = useState<number>(199);
   const [planPeriod, setPlanPeriod] = useState('monthly');
+  const [customPlanPeriodDays, setCustomPlanPeriodDays] = useState<number>(7);
+  const [customPlanPeriodMonths, setCustomPlanPeriodMonths] = useState<number>(3);
   const [planCurrency, setPlanCurrency] = useState('SAR');
   const [planFeatures, setPlanFeatures] = useState('');
 
@@ -1779,7 +1783,13 @@ export default function SuperAdminPage() {
                       <div key={plan.id} className="card" style={{ backgroundColor: '#10101b', borderColor: '#1e1e2f', padding: '1.25rem' }}>
                         <div className="flex-between">
                           <h4 style={{ fontWeight: 'bold', color: '#fff' }}>{plan.name}</h4>
-                          <span className="badge badge-primary">{plan.period === 'yearly' ? 'سنوي' : 'شهري'}</span>
+                          <span className="badge badge-primary">
+                            {plan.period === 'yearly' ? 'سنوي' : 
+                             plan.period === 'monthly' ? 'شهري' : 
+                             plan.period.endsWith('d') ? `${plan.period.replace('d', '')} يوم` :
+                             plan.period.endsWith('m') ? `${plan.period.replace('m', '')} شهر` :
+                             plan.period}
+                          </span>
                         </div>
                         <p style={{ fontSize: '1.45rem', fontWeight: 800, color: '#6366f1', margin: '0.5rem 0' }}>
                           {plan.price} {plan.currency || 'SAR'}
@@ -2699,11 +2709,30 @@ export default function SuperAdminPage() {
                     <label className="form-label">دورة الدفع</label>
                     <select 
                       className="form-select"
-                      value={custPeriod}
-                      onChange={e => setCustPeriod(e.target.value)}
+                      value={
+                        custPeriod === 'monthly' || custPeriod === 'yearly'
+                          ? custPeriod
+                          : custPeriod.endsWith('d')
+                          ? 'custom_days'
+                          : custPeriod.endsWith('m')
+                          ? 'custom_months'
+                          : 'monthly'
+                      }
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (val === 'monthly' || val === 'yearly') {
+                          setCustPeriod(val);
+                        } else if (val === 'custom_days') {
+                          setCustPeriod(`${customCustPeriodDays}d`);
+                        } else if (val === 'custom_months') {
+                          setCustPeriod(`${customCustPeriodMonths}m`);
+                        }
+                      }}
                     >
                       <option value="monthly">شهري</option>
                       <option value="yearly">سنوي</option>
+                      <option value="custom_days">عدد أيام مخصص</option>
+                      <option value="custom_months">عدد أشهر مخصص</option>
                     </select>
                   </div>
 
@@ -2718,6 +2747,52 @@ export default function SuperAdminPage() {
                     />
                   </div>
                 </div>
+
+                {(custPeriod.endsWith('d') || custPeriod === 'custom_days') && (
+                  <div className="form-group animate-fade-in" style={{ transition: 'all 0.3s' }}>
+                    <label className="form-label">عدد الأيام المخصصة لدورة الدفع</label>
+                    <input 
+                      type="number" 
+                      min={1}
+                      className="form-input" 
+                      value={
+                        custPeriod.endsWith('d') 
+                          ? parseInt(custPeriod.replace('d', '')) || customCustPeriodDays 
+                          : customCustPeriodDays
+                      }
+                      onChange={e => {
+                        const val = Math.max(1, parseInt(e.target.value) || 1);
+                        setCustomCustPeriodDays(val);
+                        setCustPeriod(`${val}d`);
+                      }}
+                      style={{ backgroundColor: '#171725', borderColor: '#2e2e48', color: '#fff' }}
+                      required 
+                    />
+                  </div>
+                )}
+
+                {(custPeriod.endsWith('m') || custPeriod === 'custom_months') && (
+                  <div className="form-group animate-fade-in" style={{ transition: 'all 0.3s' }}>
+                    <label className="form-label">عدد الأشهر المخصصة لدورة الدفع</label>
+                    <input 
+                      type="number" 
+                      min={1}
+                      className="form-input" 
+                      value={
+                        custPeriod.endsWith('m') 
+                          ? parseInt(custPeriod.replace('m', '')) || customCustPeriodMonths 
+                          : customCustPeriodMonths
+                      }
+                      onChange={e => {
+                        const val = Math.max(1, parseInt(e.target.value) || 1);
+                        setCustomCustPeriodMonths(val);
+                        setCustPeriod(`${val}m`);
+                      }}
+                      style={{ backgroundColor: '#171725', borderColor: '#2e2e48', color: '#fff' }}
+                      required 
+                    />
+                  </div>
+                )}
 
                 <div className="form-group">
                   <label className="form-label">تاريخ انتهاء وفوترة الاشتراك</label>
@@ -2852,13 +2927,78 @@ export default function SuperAdminPage() {
                     <label className="form-label">دورة الفوترة</label>
                     <select 
                       className="form-select"
-                      value={planPeriod}
-                      onChange={e => setPlanPeriod(e.target.value)}
+                      value={
+                        planPeriod === 'monthly' || planPeriod === 'yearly'
+                          ? planPeriod
+                          : planPeriod.endsWith('d')
+                          ? 'custom_days'
+                          : planPeriod.endsWith('m')
+                          ? 'custom_months'
+                          : 'monthly'
+                      }
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (val === 'monthly' || val === 'yearly') {
+                          setPlanPeriod(val);
+                        } else if (val === 'custom_days') {
+                          setPlanPeriod(`${customPlanPeriodDays}d`);
+                        } else if (val === 'custom_months') {
+                          setPlanPeriod(`${customPlanPeriodMonths}m`);
+                        }
+                      }}
                     >
                       <option value="monthly">شهري</option>
                       <option value="yearly">سنوي</option>
+                      <option value="custom_days">عدد أيام مخصص</option>
+                      <option value="custom_months">عدد أشهر مخصص</option>
                     </select>
                   </div>
+
+                  {(planPeriod.endsWith('d') || planPeriod === 'custom_days') && (
+                    <div className="form-group animate-fade-in" style={{ transition: 'all 0.3s' }}>
+                      <label className="form-label">عدد الأيام المخصصة</label>
+                      <input 
+                        type="number" 
+                        min={1}
+                        className="form-input" 
+                        value={
+                          planPeriod.endsWith('d') 
+                            ? parseInt(planPeriod.replace('d', '')) || customPlanPeriodDays 
+                            : customPlanPeriodDays
+                        }
+                        onChange={e => {
+                          const val = Math.max(1, parseInt(e.target.value) || 1);
+                          setCustomPlanPeriodDays(val);
+                          setPlanPeriod(`${val}d`);
+                        }}
+                        style={{ backgroundColor: '#171725', borderColor: '#2e2e48', color: '#fff' }}
+                        required 
+                      />
+                    </div>
+                  )}
+
+                  {(planPeriod.endsWith('m') || planPeriod === 'custom_months') && (
+                    <div className="form-group animate-fade-in" style={{ transition: 'all 0.3s' }}>
+                      <label className="form-label">عدد الأشهر المخصصة</label>
+                      <input 
+                        type="number" 
+                        min={1}
+                        className="form-input" 
+                        value={
+                          planPeriod.endsWith('m') 
+                            ? parseInt(planPeriod.replace('m', '')) || customPlanPeriodMonths 
+                            : customPlanPeriodMonths
+                        }
+                        onChange={e => {
+                          const val = Math.max(1, parseInt(e.target.value) || 1);
+                          setCustomPlanPeriodMonths(val);
+                          setPlanPeriod(`${val}m`);
+                        }}
+                        style={{ backgroundColor: '#171725', borderColor: '#2e2e48', color: '#fff' }}
+                        required 
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group">

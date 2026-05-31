@@ -58,8 +58,17 @@ export async function GET() {
     tenants.forEach((t: any) => {
       if (t.status !== 'active' && t.status !== 'trial') return;
       const price = t.subscriptionPrice !== null ? t.subscriptionPrice : (defaultPrices[t.plan] || 199);
-      if (t.subscriptionPeriod === 'yearly') {
+      const period = t.subscriptionPeriod || 'monthly';
+      if (period === 'yearly') {
         mrr += price / 12;
+      } else if (period === 'monthly') {
+        mrr += price;
+      } else if (period.endsWith('d')) {
+        const days = parseInt(period.replace('d', '')) || 30;
+        mrr += (price / days) * 30;
+      } else if (period.endsWith('m')) {
+        const months = parseInt(period.replace('m', '')) || 1;
+        mrr += price / months;
       } else {
         mrr += price;
       }
