@@ -4,7 +4,17 @@ const getPrismaClient = () => {
   const connectionString = process.env.DATABASE_URL || '';
   
   if (connectionString.startsWith('postgresql://') || connectionString.startsWith('postgres://')) {
-    return new PrismaClient();
+    try {
+      const { Pool } = require('pg');
+      const { PrismaPg } = require('@prisma/adapter-pg');
+      
+      const pool = new Pool({ connectionString });
+      const adapter = new PrismaPg(pool);
+      return new PrismaClient({ adapter });
+    } catch (e) {
+      console.error('Failed to initialize Postgres adapter in Prisma 7:', e);
+      return new PrismaClient();
+    }
   }
   
   try {
