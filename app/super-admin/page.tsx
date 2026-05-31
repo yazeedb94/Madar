@@ -780,13 +780,6 @@ export default function SuperAdminPage() {
               <ShieldCheck size={18} /> دخول إلى مركز السيطرة الآمن
             </button>
           </form>
-
-          <div style={{ marginTop: '1.75rem', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)', borderTop: '1px dashed #2e2e48', paddingTop: '1.25rem' }}>
-            <p>بيانات الدخول التجريبية الآمنة للمسؤول:</p>
-            <code style={{ color: '#818cf8', background: '#181829', padding: '4px 10px', borderRadius: '6px', display: 'inline-block', marginTop: '0.5rem', fontWeight: 'bold', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-              admin@saas.com / admin
-            </code>
-          </div>
         </div>
       </div>
     );
