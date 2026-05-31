@@ -30,13 +30,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة!' }, { status: 401 });
   } catch (err: any) {
     console.error('Super Admin login error:', err);
-    // DEBUG: expose real error temporarily
-    return NextResponse.json({
-      error: 'حدث خطأ في خادم النظام',
-      debug_message: err?.message || 'unknown error',
-      debug_code: err?.code || 'no code',
-      db_url_set: !!process.env.DATABASE_URL,
-      db_url_prefix: process.env.DATABASE_URL?.substring(0, 30) || 'NOT SET',
-    }, { status: 500 });
+    return NextResponse.json({ error: 'حدث خطأ في خادم النظام' }, { status: 500 });
   }
 }
