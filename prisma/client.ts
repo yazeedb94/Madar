@@ -4,7 +4,14 @@ import { PrismaPg } from '@prisma/adapter-pg';
 
 const getPrismaClient = () => {
   const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/db';
-  const pool = new Pool({ connectionString });
+  
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  const pool = new Pool({
+    connectionString,
+    ssl: isProduction ? { rejectUnauthorized: false } : false,
+  });
+  
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 };
@@ -15,4 +22,3 @@ const prisma = globalForPrisma.prisma ?? getPrismaClient();
 export default prisma;
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
-
