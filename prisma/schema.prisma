@@ -1,0 +1,190 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  type        String
+  email       String   @unique
+  password    String   // bcrypt hash
+  currency    String
+  plan        String
+  language    String
+  status             String   @default("active")
+  subscriptionPeriod String   @default("monthly")
+  subscriptionPrice  Float?
+  expiryDate         String?
+  createdAt          DateTime @default(now())
+  // relations
+  settings    Setting?
+  customers   Customer[]
+  plans       Plan[]
+  attendance  Attendance[]
+  payments    Payment[]
+  notifications Notification[]
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  tenantId  String   @unique
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  // Add additional setting fields as needed, e.g., theme, locale
+  theme     String?
+  locale    String?
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  name      String
+  email     String
+  phone     String?
+  // other customer fields
+}
+
+model Plan {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  name      String
+  price     Float
+  period    String   // e.g., "monthly" or "yearly"
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  date      DateTime
+  present   Boolean
+  // other attendance fields
+}
+
+model Payment {
+  id         String   @id @default(uuid())
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  amount     Float
+  currency   String
+  paidAt     DateTime
+  // other payment fields
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model PlatformPlan {
+  id        String   @id @default(uuid())
+  name      String
+  price     Float
+  period    String   @default("monthly")
+  currency  String   @default("SAR")
+  features  String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model SaaSSetting {
+  id           String   @id @default(uuid())
+  platformName String   @default("منصتي")
+  logoUrl      String?
+  theme        String   @default("dark")
+  currency     String   @default("SAR")
+  language     String   @default("ar")
+  taxes        Float    @default(15.0)
+  adminEmail   String   @default("admin@saas.com")
+  adminPassword String  @default("admin")
+  createdAt    DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  action    String
+  operator  String
+  target    String
+  ip        String?
+  createdAt DateTime @default(now())
+}
+
+model SupportTicket {
+  id          String   @id @default(uuid())
+  tenantId    String?
+  tenantName  String
+  type        String   // complaint, problem, request
+  subject     String
+  description String
+  status      String   @default("open") // open, in_progress, resolved
+  priority    String   @default("medium") // low, medium, high
+  reply       String?
+  createdAt   DateTime @default(now())
+}
+
+model SupportLog {
+  id        String   @id @default(uuid())
+  type      String   // problem, solution
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model SystemError {
+  id        String   @id @default(uuid())
+  type      String   // backend_error, frontend_crash, failed_job
+  message   String
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
+}
+
+model ActiveSession {
+  id         String   @id @default(uuid())
+  userId     String
+  email      String
+  role       String
+  ip         String
+  userAgent  String
+  lastActive DateTime @default(now())
+}
+
+model PlatformInvoice {
+  id         String   @id @default(uuid())
+  tenantId   String
+  tenantName String
+  amount     Float
+  currency   String
+  status     String   @default("unpaid") // paid, unpaid, overdue
+  dueDate    DateTime
+  createdAt  DateTime @default(now())
+}
+
+model PlatformPayment {
+  id         String   @id @default(uuid())
+  tenantId   String
+  tenantName String
+  amount     Float
+  currency   String
+  method     String   // card, bank_transfer, cash
+  paidAt     DateTime @default(now())
+}
+
+model PlatformRenewal {
+  id         String   @id @default(uuid())
+  tenantId   String
+  tenantName String
+  planName   String
+  period     String
+  price      Float
+  renewedAt  DateTime @default(now())
+}
+
