@@ -161,7 +161,7 @@ export const savePayment = (payment: any): void => {
   }
 };
 
-// Attendance
+// Attendance (legacy — kept for backward compat)
 export const getAttendance = (): any[] => {
   if (typeof window !== 'undefined') {
     const data = localStorage.getItem('saas_sub_attendance');
@@ -182,6 +182,108 @@ export const saveAttendance = (attendance: any): void => {
     localStorage.setItem('saas_sub_attendance', JSON.stringify(list));
     autoBackupTenantData();
   }
+};
+
+// ─── Access Cards ────────────────────────────────────────────────────────────
+
+export type AccessCard = {
+  id: string;
+  uid: string;
+  type: 'rfid' | 'nfc' | 'qr' | 'barcode';
+  status: 'active' | 'disabled' | 'lost' | 'expired' | 'suspended';
+  customerId: string;
+  activatedAt: string;
+  deactivatedAt?: string;
+  notes?: string;
+};
+
+export const getAccessCards = (): AccessCard[] => {
+  if (typeof window !== 'undefined') {
+    const data = localStorage.getItem('saas_access_cards');
+    return data ? JSON.parse(data) : [];
+  }
+  return [];
+};
+
+export const saveAccessCard = (card: AccessCard): void => {
+  if (typeof window !== 'undefined') {
+    const list = getAccessCards();
+    const idx = list.findIndex(c => c.id === card.id);
+    if (idx >= 0) {
+      list[idx] = card;
+    } else {
+      list.push(card);
+    }
+    localStorage.setItem('saas_access_cards', JSON.stringify(list));
+    autoBackupTenantData();
+  }
+};
+
+export const deleteAccessCard = (id: string): void => {
+  if (typeof window !== 'undefined') {
+    const list = getAccessCards().filter(c => c.id !== id);
+    localStorage.setItem('saas_access_cards', JSON.stringify(list));
+    autoBackupTenantData();
+  }
+};
+
+// ─── Attendance Logs (Full Access Control History) ───────────────────────────
+
+export type AttendanceLog = {
+  id: string;
+  customerId: string;
+  customerName?: string;
+  cardUid?: string;
+  entryType: 'entry' | 'exit';
+  result: 'granted' | 'denied';
+  reason?: 'expired' | 'frozen' | 'disabled_card' | 'lost_card' | 'unknown_card' | 'duplicate' | 'no_card';
+  gate: string;
+  timestamp: string;
+  sessionId?: string;
+  date: string;
+};
+
+export const getAttendanceLogs = (): AttendanceLog[] => {
+  if (typeof window !== 'undefined') {
+    const data = localStorage.getItem('saas_attendance_logs');
+    return data ? JSON.parse(data) : [];
+  }
+  return [];
+};
+
+export const saveAttendanceLog = (log: AttendanceLog): void => {
+  if (typeof window !== 'undefined') {
+    const list = getAttendanceLogs();
+    const idx = list.findIndex(l => l.id === log.id);
+    if (idx >= 0) {
+      list[idx] = log;
+    } else {
+      list.push(log);
+    }
+    localStorage.setItem('saas_attendance_logs', JSON.stringify(list));
+    autoBackupTenantData();
+  }
+};
+
+/**
+ * Returns customers currently inside the gym:
+ * those who have a granted 'entry' with no subsequent granted 'exit' today (or ever in same session).
+ */
+export const getActiveSessions = (): { customerId: string; entryLog: AttendanceLog }[] => {
+  if (typeof window === 'undefined') return [];
+  const logs = getAttendanceLogs();
+  // Build map: customerId → last granted log
+  const lastGranted: Record<string, AttendanceLog> = {};
+  const sorted = [...logs].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  for (const log of sorted) {
+    if (log.result === 'granted') {
+      lastGranted[log.customerId] = log;
+    }
+  }
+  // Those whose last granted log is an 'entry' are currently inside
+  return Object.values(lastGranted)
+    .filter(log => log.entryType === 'entry')
+    .map(log => ({ customerId: log.customerId, entryLog: log }));
 };
 
 // Notifications
