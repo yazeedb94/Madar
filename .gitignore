@@ -41,3 +41,6 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+
+# Runtime data — never commit local DB to git (overwrites production data on Railway!)
+/data/db.json
