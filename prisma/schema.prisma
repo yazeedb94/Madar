@@ -188,3 +188,13 @@ model PlatformRenewal {
   renewedAt  DateTime @default(now())
 }
 
+// ─── Tenant Data Persistence (replaces data/db.json) ─────────────────────────
+// Each tenant's full data (customers, plans, attendance, payments, notifications)
+// is stored as a single JSON blob here, keyed by tenantId.
+// This survives Railway redeploys unlike the ephemeral filesystem.
+model TenantBackup {
+  tenantId  String   @id
+  data      String   // JSON: { settings, customers, plans, attendance, payments, notifications }
+  updatedAt DateTime @updatedAt
+}
+
